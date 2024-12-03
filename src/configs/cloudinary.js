@@ -1,4 +1,4 @@
-const CLOUDINARY_URL='cloudinary://661496711387959:2CCrv5pCjg-Ll4C9XSEu8IiS2F0@ddziqv9ot'
+// const CLOUDINARY_URL='cloudinary://661496711387959:2CCrv5pCjg-Ll4C9XSEu8IiS2F0@ddziqv9ot'
 require('dotenv').config(); 
 const configCloudinary = () => {
     if (typeof process.env.CLOUDINARY_URL === 'undefined') {
