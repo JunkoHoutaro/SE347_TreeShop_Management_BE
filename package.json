@@ -1,0 +1,38 @@
+{
+  "name": "se347_treeshop_managemnet_be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JunkoHoutaro/SE347_TreeShop_Managemnet_BE.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JunkoHoutaro/SE347_TreeShop_Managemnet_BE/issues"
+  },
+  "homepage": "https://github.com/JunkoHoutaro/SE347_TreeShop_Managemnet_BE.git#readme",
+  "dependencies": {
+    "@cloudinary/react": "^1.13.0",
+    "@cloudinary/url-gen": "^1.20.0",
+    "argon2": "^0.30.2",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cloudinary": "^1.32.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.6",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^6.13.4",
+    "mongoose-delete": "^0.5.4",
+    "mongoose-sequence": "^5.3.1",
+    "nodemon": "^2.0.20",
+    "qs": "^6.11.0",
+    "query-types": "^0.1.4"
+  }
+}
