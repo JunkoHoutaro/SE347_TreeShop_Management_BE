@@ -6,24 +6,26 @@ const corsConfig = require('./configs/cors');
 const connectDB = require('./configs/db');
 const route = require('./routes');
 
+// Kết nối database
 connectDB();
 
-// app
+// Khởi tạo ứng dụng Express
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 app.use(corsConfig);
 
+// Middleware cho bộ lọc và sắp xếp
 app.use(parseFilters, parseSorts);
 
-// route
+// Định nghĩa route
 app.use('/api', route);
 app.get('/', (req, res) => {
     res.json('Hello world 12345!');
 });
-console.log(process.env.PORT)
-const PORT = process.env.PORT || 301;
+
+console.log(process.env.PORT);
+const PORT = process.env.PORT || 302;
 app.listen(PORT, () => {
-    
     console.log(`Example app listening on PORT ${PORT}`);
 });

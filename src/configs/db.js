@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-// const DB_CONNECTION_STRING = 'mongodb+srv://junko:090702@se347.bzdix.mongodb.net/?retryWrites=true&w=majority&appName=SE347'
+const DB_CONNECTION_STRING = 'mongodb+srv://junko:090702@se347.bzdix.mongodb.net/?retryWrites=true&w=majority&appName=SE347'
 require('dotenv').config(); 
 const connectDB = async () => {
     try { console.log(process.env.DB_CONNECTION_STRING)
