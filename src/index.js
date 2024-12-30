@@ -4,11 +4,12 @@ const parseSorts = require('./middleware/parseSorts');
 require('dotenv').config();
 const corsConfig = require('./configs/cors');
 const connectDB = require('./configs/db');
+const configCloudinary = require('./configs/cloudinary')
 const route = require('./routes');
 
 // Kết nối database
 connectDB();
-
+configCloudinary();
 // Khởi tạo ứng dụng Express
 const app = express();
 app.use(express.json({ limit: '50mb' }));

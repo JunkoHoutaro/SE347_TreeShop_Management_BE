@@ -1,87 +1,103 @@
-const Account = require('../models/Account');
 const argon2 = require('argon2');
-const Permission = require('../models/Permission');
-const Role = require('../models/Role'); 
+const Account = require('../models/Account'); 
+const Role = require('../models/Role');
+const Function = require('../models/Function'); 
 
-// [POST] api/auth/login
-const login = async (req, res, next) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ success: false, status: 400, message: 'Missed field' });
-    }
-
+// Define the getFunctionsByRole function
+const getFunctionsByRole = async (roleId) => {
     try {
-        // Tìm tài khoản
-        const account = await Account.findOne({ username }).populate('role');
-        if (!account) {
-            return res.status(401).json({ success: false, status: 401, message: 'Username incorrect' });
-        }
-
-        // Xác thực mật khẩu
-        const passwordValid = await argon2.verify(account.password, password);
-        if (!passwordValid) {
-            return res.status(401).json({ success: false, status: 401, message: 'Password incorrect' });
-        }
-
-        // Lấy quyền
-        const roleId = account.role._id;
-        const permissions = await Permission.find({ role: roleId }).populate('function');
-
-        // Tạo danh sách chức năng
-        const functions = permissions.map(permission => permission.function);
-
-        // Trả về kết quả
-        return res.status(200).json({
-            success: true,
-            account: {
-                ...account.toObject(),
-                functions
-            }
-        });
+        const functions = await Function.find({ role: roleId });
+        return functions;
     } catch (err) {
-        console.error('Error in login:', err);
-        return res.status(500).json({ success: false, status: 500, message: 'Internal server error' });
+        console.error('Error fetching functions by role:', err);
+        throw err;
     }
 };
-// [POST] api/auth/register
-const register = async (req, res, next) => {
-    const { username, password, roleName } = req.body;
 
-    if (!username || !password || !roleName) {
-        return res.status(400).json({ success: false, status: 400, message: 'Missed field' });
+// [POST] api/auth/login
+const login = async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const account = await Account.findOne({ username }).populate('role');
+        if (!account) {
+            return res.status(401).json({ success: false, message: 'Invalid username or password' });
+        }
+
+        const isValid = await argon2.verify(account.password, password);
+        if (!isValid) {
+            return res.status(401).json({ success: false, message: 'Invalid username or password' });
+        }
+
+        const role = account.role;
+        if (!role) {
+            return res.status(500).json({ success: false, message: 'Role not found' });
+        }
+
+        const sanitizedAccount = {
+            _id: account._id,
+            username: account.username,
+            role: role.name
+        };
+
+        const functions = await getFunctionsByRole(role._id);
+
+        return res.status(200).json({
+            success: true,
+            account: sanitizedAccount,
+            functions
+        });
+    } catch (err) {
+        console.error('Login error:', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+// [POST] api/auth/register
+const register = async (req, res) => {
+    const { username, password, roleName, name } = req.body;
+
+    if (!username || !password || !roleName || !name) {
+        return res.status(400).json({ success: false, message: 'Missing field(s)' });
     }
 
     try {
-        // Kiểm tra xem người dùng đã tồn tại chưa
+        // Kiểm tra tài khoản đã tồn tại
         const existingAccount = await Account.findOne({ username });
         if (existingAccount) {
-            return res.status(400).json({ success: false, status: 400, message: 'Username already exists' });
+            return res.status(409).json({ success: false, message: 'Username already exists' });
         }
 
         // Tìm role theo tên
         const role = await Role.findOne({ name: roleName });
         if (!role) {
-            return res.status(400).json({ success: false, status: 400, message: 'Role does not exist' });
+            return res.status(404).json({ success: false, message: 'Role not found' });
+        }
+
+        // Kiểm tra độ mạnh của mật khẩu (ví dụ: tối thiểu 8 ký tự)
+        if (password.length < 8) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long' });
         }
 
         // Mã hóa mật khẩu
         const hashedPassword = await argon2.hash(password);
 
-        // Tạo tài khoản mới
+        // Tạo tài khoản
         const newAccount = new Account({
             username,
             password: hashedPassword,
-            role: role.id
+            role: role._id,
+            name // Ensure the name field is included
         });
 
-        // Lưu tài khoản mới vào cơ sở dữ liệu
+        // Lưu vào cơ sở dữ liệu
         await newAccount.save();
 
-        return res.status(201).json({ success: true, status: 201, message: 'Account created successfully' });
+        return res.status(201).json({ success: true, message: 'Account created successfully' });
     } catch (err) {
-        console.error('Error in register:', err);
-        return res.status(500).json({ success: false, status: 500, message: 'Internal server error' });
+        console.error('Register error:', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+
 module.exports = { login, register };

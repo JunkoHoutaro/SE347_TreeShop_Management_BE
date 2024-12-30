@@ -1,13 +1,21 @@
-const CLOUDINARY_URL='cloudinary://661496711387959:2CCrv5pCjg-Ll4C9XSEu8IiS2F0@ddziqv9ot'
-require('dotenv').config(); 
+require('dotenv').config();
+const cloudinary = require('cloudinary').v2;
+
 const configCloudinary = () => {
-    if (typeof process.env.CLOUDINARY_URL === 'undefined') {
+    if (!process.env.CLOUDINARY_URL) {
         console.warn('!! cloudinary config is undefined !!');
         console.warn('export CLOUDINARY_URL or set dotenv file');
     } else {
-        console.log('cloudinary config:');
-        console.log(cloudinary.config());
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dvb2x1trn',
+            api_key: process.env.CLOUDINARY_API_KEY, 
+            api_secret: process.env.CLOUDINARY_API_SECRET, 
+            secure: true
+        });
+
+        console.log('Cloudinary configuration successful');
     }
 };
+
 
 module.exports = configCloudinary;
